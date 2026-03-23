@@ -1,6 +1,6 @@
 ---
 name: layer-interface
-description: "Trabalhando na camada interfaces. Use para criar ou alterar GUI JavaFX, TUI textual ou bootstrap de entrada do usuário. A interface renderiza e delega; não implementa regras de negócio."
+description: "Construindo a camada interfaces. Use para criar ou alterar GUI JavaFX, TUI textual ou bootstrap de entrada. Não use para regra de negócio (use layer-application), adapters (use layer-infrastructure) ou modelagem de domínio (use layer-domain)."
 ---
 
 # Skill: Camada Interface
@@ -22,7 +22,7 @@ Esta camada:
 - transforma input do usuário em comandos de aplicação
 - decide forma de renderização, não regra de recuperação
 
-## Checklist
+## Instruções
 
 ### 1. Delegar corretamente
 
@@ -39,15 +39,15 @@ Esta camada:
 
 ### 3. Não vazar responsabilidades
 
-- [ ] Nada de `ProcessBuilder`
-- [ ] Nada de `systemctl`
-- [ ] Nada de seleção de profile ou regra de negócio duplicada
+- [ ] Nenhum `ProcessBuilder` ou `systemctl` aqui
+- [ ] Nenhuma seleção de profile ou regra de negócio duplicada
+- [ ] Output de `System.out` somente via `TuiPrinter` port — nunca direto
 
 ## Critical
 
-- GUI e TUI devem consumir os mesmos use cases
-- TUI não é desculpa para duplicar lógica de aplicação
-- Controller não deve decidir política de retry, timeout ou fallback técnico
+- GUI e TUI devem consumir os mesmos use cases — comportamento divergente indica lógica duplicada em algum dos lados
+- Controller com `if` sobre distro ou serviço está fazendo trabalho do use case — mova a lógica
+- Política de retry, timeout ou fallback técnico pertence ao use case, não ao controller
 - Mensagens ao usuário podem ser adaptadas por interface, mas a verdade do resultado vem do use case
 
 ## Exemplos
@@ -56,17 +56,32 @@ Esta camada:
 
 1. Botão chama `executeFixActionUseCase.execute(AUDIO)`
 2. Desabilita interação durante execução
-3. Mostra resultado amigável e logs estruturados
+3. Mostra resultado amigável e logs estruturados do `RecoveryResult`
+4. Reabilita ao final — sucesso ou falha
 
 ### Exemplo 2: Menu TUI
 
 1. Lista ações suportadas
 2. Usuário escolhe opção por número/tecla
 3. Componente chama o mesmo use case da GUI
-4. Saída é renderizada no terminal
+4. Saída renderizada no terminal via `TuiPrinter`
+
+## Troubleshooting
+
+**GUI e TUI têm comportamento diferente para a mesma ação**
+- Causa: lógica duplicada em ambas as interfaces
+- Solução: Consolidar no use case; ambas as interfaces chamam o mesmo use case
+
+**TUI exibe stacktrace ao usuário**
+- Causa: exception não tratada no componente
+- Solução: Capturar exception, transformar em `RecoveryResult` com `success=false` e mensagem legível
+
+**Controller cresce com múltiplos `if` condicionais**
+- Causa: decisões que pertencem ao use case estão vazando para a interface
+- Solução: Mover decisões para o use case correspondente; controller apenas renderiza o resultado
 
 ## Consulte também
 
-- [../layer-application/SKILL.md](../layer-application/SKILL.md) — camada que a interface deve chamar
-- [../write-tests/SKILL.md](../write-tests/SKILL.md) — estratégia de testes para controllers e fluxos
-- [../enforce-architecture/SKILL.md](../enforce-architecture/SKILL.md) — validação final obrigatória
+- [layer-application](../layer-application/SKILL.md) — camada que a interface deve chamar
+- [write-tests](../write-tests/SKILL.md) — estratégia de testes para controllers e fluxos
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória

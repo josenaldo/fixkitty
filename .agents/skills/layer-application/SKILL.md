@@ -1,6 +1,6 @@
 ---
 name: layer-application
-description: "Trabalhando na camada application. Use para criar ou alterar use cases, fluxos de execução, políticas de orquestração e coordenação entre domain e ports. Não use para modelagem pura nem para adapters concretos."
+description: "Orquestrando a camada application. Use quando criar ou alterar use cases, fluxos de execução, políticas de orquestração e coordenação entre domain e ports. Não use para modelagem pura de domínio (use layer-domain), adapters concretos (use layer-infrastructure) ou telas (use layer-interface)."
 ---
 
 # Skill: Camada Application
@@ -27,7 +27,7 @@ Esta camada não:
 - conhece adapters concretos
 - conhece JavaFX ou renderização de terminal
 
-## Checklist
+## Instruções
 
 ### 1. Criar o use case
 
@@ -50,9 +50,9 @@ Esta camada não:
 
 ## Critical
 
-- Use case não é lugar para string de shell
-- Use case não é lugar para parsing de `/etc/os-release`
-- Use case não é lugar para lógica de widget, botão ou teclado
+- Use case que constrói strings de shell está com responsabilidade vazada — mova para o adapter correspondente via port
+- Use case que parseia `/etc/os-release` ou detecta distro pertence à infrastructure — crie port e injete
+- Use case que referencia widget, botão ou tecla pertence à interface — remova a referência e delegue output
 - Se a classe começar a conhecer tecnologia concreta, ela está vazando responsabilidade
 
 ## Exemplos
@@ -67,13 +67,27 @@ Esta camada não:
 
 ### Exemplo 2: `CheckEnvironmentUseCase`
 
-1. Detecta ambiente
+1. Detecta ambiente via port
 2. Lista ações suportadas
-3. Retorna resumo para GUI e TUI renderizarem
+3. Retorna resumo para GUI e TUI renderizarem independentemente
+
+## Troubleshooting
+
+**Use case importa classe de infrastructure**
+- Causa: violação de Clean Architecture
+- Solução: Criar interface (port) em `core/ports/`, implementar em infra, injetar no use case
+
+**Política de falha não documentada**
+- Causa: `if` espalhado sem intenção clara
+- Solução: Nomear explicitamente a política (`continueOnPartialFailure`, `abortOnFirstError`) e documentar no use case
+
+**Use case cresce mais de ~100 linhas**
+- Causa: orquestração misturada com detalhe de execução
+- Solução: Extrair sub-use-cases ou delegar detalhes via ports novos
 
 ## Consulte também
 
-- [../layer-domain/SKILL.md](../layer-domain/SKILL.md) — modelagem dos tipos usados aqui
-- [../layer-infrastructure/SKILL.md](../layer-infrastructure/SKILL.md) — implementação concreta dos ports
-- [../write-tests/SKILL.md](../write-tests/SKILL.md) — cobertura obrigatória de use cases
-- [../enforce-architecture/SKILL.md](../enforce-architecture/SKILL.md) — validação final obrigatória
+- [layer-domain](../layer-domain/SKILL.md) — modelagem dos tipos usados aqui
+- [layer-infrastructure](../layer-infrastructure/SKILL.md) — implementação concreta dos ports
+- [write-tests](../write-tests/SKILL.md) — cobertura obrigatória de use cases
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória

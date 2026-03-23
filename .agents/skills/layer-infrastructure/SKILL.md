@@ -1,6 +1,6 @@
 ---
 name: layer-infrastructure
-description: "Trabalhando na camada infrastructure. Use para implementar ports, integrar com Linux real, definir profiles, command runners, privilege strategies e logging. Não use para regra de negócio nem para controllers."
+description: "Implementando a camada infrastructure. Use para implementar ports, integrar com Linux real, definir profiles por distro, command runners, privilege strategies e logging. Não use para regra de negócio (use layer-application) nem para controllers (use layer-interface)."
 ---
 
 # Skill: Camada Infrastructure
@@ -17,12 +17,12 @@ description: "Trabalhando na camada infrastructure. Use para implementar ports, 
 Infrastructure traduz intenção em execução concreta.
 
 Esta camada:
-- implementa ports
+- implementa ports definidos em `core/`
 - conhece Linux real
 - encapsula diferenças entre Ubuntu/Fedora/Mint
 - isola detalhes de execução, timeout e saída de processo
 
-## Checklist
+## Instruções
 
 ### 1. Implementar port existente
 
@@ -33,22 +33,22 @@ Esta camada:
 ### 2. Isolar detalhes operacionais
 
 - [ ] Timeout configurável
-- [ ] stdout/stderr capturados
-- [ ] exit code mapeado para tipo estruturado
-- [ ] erros convertidos em retorno previsível
+- [ ] stdout/stderr capturados e mapeados
+- [ ] exit code convertido para tipo estruturado do domínio
+- [ ] Erros retornados como resultado previsível, não exceção genérica
 
 ### 3. Preparar crescimento multi-ambiente
 
 - [ ] Profiles separados por distro/desktop
-- [ ] Nada de `if` gigante espalhado por todo adapter
-- [ ] Comandos concretos centralizados em local apropriado
+- [ ] Comandos concretos centralizados no profile, não espalhados em adapters
+- [ ] Cada implementação substituível por mock em teste
 
 ## Critical
 
-- NUNCA importar controllers GUI/TUI
-- NUNCA mover decisão de negócio para o adapter só porque é mais fácil
-- NUNCA deixar `ProcessBuilder` espalhado em várias classes sem encapsulamento
-- Toda implementação concreta deve continuar substituível por mock em teste
+- Importar controllers GUI/TUI aqui cria acoplamento proibido — infrastructure não conhece interfaces
+- Decisões de negócio movidas para o adapter por conveniência criam lógica duplicada invisível — mantenha no use case via port
+- `ProcessBuilder` espalhado em múltiplas classes sem encapsulamento dificulta troca de estratégia — centralize
+- Toda implementação concreta deve permanecer substituível por mock em teste unitário
 
 ## Exemplos
 
@@ -56,17 +56,32 @@ Esta camada:
 
 1. Implementa `CommandRunner`
 2. Recebe `CommandRequest`
-3. Executa processo com timeout
-4. Retorna `CommandExecutionResult`
+3. Executa processo com timeout configurável
+4. Retorna `CommandExecutionResult` com stdout, stderr e exit code mapeados
 
 ### Exemplo 2: `Ubuntu24Profile`
 
-1. Expõe ações suportadas
-2. Mapeia ações para steps concretos
-3. Declara necessidades de privilégio e limites do ambiente
+1. Implementa `EnvironmentProfile`
+2. Expõe ações suportadas (`AUDIO`, `NETWORK`, `BLUETOOTH`)
+3. Mapeia ação para steps concretos com comando shell e flag de privilégio
+4. Declara limites do ambiente (ex: PipeWire em user-space, bluetooth em root)
+
+## Troubleshooting
+
+**Adapter cresceu com lógica de negócio**
+- Causa: decisão de fluxo colocada aqui por conveniência
+- Solução: Mover decisão para o use case; adapter só executa e retorna resultado
+
+**Teste falha por chamar shell real**
+- Causa: mock de `CommandRunner` não configurado corretamente
+- Solução: Verificar que o teste usa mock via construtor; nunca instanciar `ProcessBuilderCommandRunner` em teste unitário
+
+**Profile diferente, mesmo bug**
+- Causa: lógica de detecção espalhada em vários adapters
+- Solução: Centralizar em `ProfileDetector`; cada profile apenas declara o que suporta
 
 ## Consulte também
 
-- [../layer-domain/SKILL.md](../layer-domain/SKILL.md) — ports e tipos implementados aqui
-- [../layer-application/SKILL.md](../layer-application/SKILL.md) — quem consome esta camada
-- [../enforce-architecture/SKILL.md](../enforce-architecture/SKILL.md) — validação final obrigatória
+- [layer-domain](../layer-domain/SKILL.md) — ports e tipos implementados aqui
+- [layer-application](../layer-application/SKILL.md) — quem consome esta camada
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória

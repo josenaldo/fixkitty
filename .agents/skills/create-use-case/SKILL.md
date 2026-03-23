@@ -1,6 +1,6 @@
 ---
 name: create-use-case
-description: "Criando Use Case na camada application para orquestrar ações de recovery. Use para criar novo orquestrador de execução, coordenar RecoveryActions e PrivilegeManager. Não use para criar a ação em si — use create-recovery-action."
+description: "Criando Use Case na camada application para orquestrar ações de recovery. Use para criar novo orquestrador de execução, coordenar RecoveryActions e portas de infraestrutura. Não use para criar a ação em si (use create-recovery-action) nem para componente de UI (use create-ui-component)."
 ---
 
 # Skill: Criar Use Case (Micro-Skill)
@@ -12,12 +12,12 @@ description: "Criando Use Case na camada application para orquestrar ações de 
 - Precisar de orquestração com controle de erro, log e rollback
 - Adicionar ponto de entrada para GUI ou TUI chamar
 
-## Checklist
+## Instruções
 
 ### 1. Criar o Use Case
 
 - [ ] `src/main/java/org/fixkitty/application/usecases/{acao}/Fix{Acao}UseCase.java`
-- [ ] Recebe `EnvironmentProfile` e `PrivilegeManager` via injeção no construtor (not static)
+- [ ] Recebe `EnvironmentProfile` e `PrivilegeManager` via injeção no construtor (não estático)
 - [ ] Método principal: `execute() → RecoveryResult`
 - [ ] `RecoveryResult` contém: `success`, `steps[]`, `errorMessage` (se falhar)
 - [ ] Sem imports de `javafx.*`, `tui.*`, `ProcessBuilder`, ou comandos Linux
@@ -26,18 +26,18 @@ description: "Criando Use Case na camada application para orquestrar ações de 
 
 - [ ] Varre ações relevantes do `EnvironmentProfile.getSupportedActions()`
 - [ ] Para cada ação: delega execução ao `CommandRunner` via port (interface, não impl)
-- [ ] Em caso de falha parcial: registra no `RecoveryResult` e decide: continuar ou abortar
+- [ ] Em caso de falha parcial: registra no `RecoveryResult` e decide explicitamente: continuar ou abortar
 
-### 3. Criar interface de port (se necessário)
+### 3. Criar port se necessário
 
 - [ ] Se Use Case precisar de IO externo (ex: logs, notificações), criar interface em `core/ports/`
 - [ ] Nunca introduzir dependência direta de infra no Use Case
 
 ## Critical
 
-- NUNCA llame `ProcessBuilder`, `Runtime.exec()` ou equivalente diretamente no Use Case
-- NUNCA acesse `System.out` ou logger de infra — use `RecoveryResult.addStep()`
-- O Use Case ONLY orquestra — toda lógica de comando fica em infra via ports
+- Use Case que chama `ProcessBuilder` ou `Runtime.exec()` está executando o que deveria ser do adapter — crie port e delegue
+- `System.out` ou logger de infra aqui acumula preocupações que pertencem à infra — use `RecoveryResult.addStep()`
+- Use Case orquestra — toda lógica de comando fica em infra via ports; lógica de regra fica em domain
 - Inputs e outputs devem ser tipos do domain (`RecoveryResult`, `RecoveryAction`, etc.)
 
 ## Exemplos
@@ -58,7 +58,7 @@ Ações:
 Ações:
 1. Cria `FixAllUseCase` que delega para `FixAudioUseCase`, `FixNetworkUseCase`, etc.
 2. Coleta todos os `RecoveryResult` individuais
-3. Retorna `RecoveryResult` composto (success = todos ok)
+3. Retorna `RecoveryResult` composto (`success = todos ok`)
 
 ## Troubleshooting
 
@@ -76,7 +76,7 @@ Ações:
 
 ## Consulte também
 
-- [create-recovery-action](../create-recovery-action/SKILL.md) — Pré-requisito: crie a ação antes
-- [create-ui-component](../create-ui-component/SKILL.md) — Próximo passo: conectar use case à UI
-- [write-unit-test](../write-unit-test/SKILL.md) — Escreva testes do use case antes de testar demo
-- [enforce-architecture](../enforce-architecture/SKILL.md) — Validação final obrigatória
+- [create-recovery-action](../create-recovery-action/SKILL.md) — pré-requisito: crie a ação antes
+- [create-ui-component](../create-ui-component/SKILL.md) — próximo passo: conectar use case à UI
+- [write-unit-test](../write-unit-test/SKILL.md) — escreva testes do use case antes do demo
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória

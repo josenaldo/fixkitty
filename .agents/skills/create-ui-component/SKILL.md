@@ -1,6 +1,6 @@
 ---
 name: create-ui-component
-description: "Criando componente de UI (Controller JavaFX ou componente TUI). Use para adicionar tela, botão, painel ou view de log. A UI apenas delega para Use Cases — sem lógica de negócio. Aplicável para interfaces/gui e interfaces/tui."
+description: "Criando componente de UI (Controller JavaFX ou componente TUI). Use para adicionar tela, botão, painel ou view de log na GUI ou TUI. Não use para criar lógica de negócio (use create-use-case) nem para definir ação de recovery (use create-recovery-action)."
 ---
 
 # Skill: Criar Componente de UI (Micro-Skill)
@@ -14,21 +14,20 @@ description: "Criando componente de UI (Controller JavaFX ou componente TUI). Us
 
 ## Regra de ouro
 
-> **Controllers são passadores de mensagem.** Pegam input do usuário → chamam use case → exibem resultado. Zero lógica de negócio.
+> **Controllers são passadores de mensagem.** Input do usuário → chama use case → exibe resultado. Zero lógica de negócio.
 
 ---
 
-## Checklist: GUI (JavaFX)
+## Instruções: GUI (JavaFX)
 
 ### 1. Criar Controller
 
 - [ ] `src/main/java/org/fixkitty/interfaces/gui/controllers/{Acao}Controller.java`
 - [ ] Recebe Use Case via injeção no construtor (`Fix{Acao}UseCase`)
 - [ ] Handler de botão: chama `useCase.execute()`, exibe `RecoveryResult`
-- [ ] Sem imports de `core/`, `application/` além do Use Case e domain types de resposta
-- [ ] Sem `ProcessBuilder`, `RuntimeException` swallowed, ou lógica condicional de distro
+- [ ] Sem imports de `infrastructure/` nem lógica condicional de distro
 
-### 2. Criar FXML (se GUI)
+### 2. Criar FXML
 
 - [ ] `src/main/resources/org/fixkitty/interfaces/gui/views/{acao}.fxml`
 - [ ] Layout com: botão de ação, área de log, indicador de status
@@ -38,12 +37,12 @@ description: "Criando componente de UI (Controller JavaFX ou componente TUI). Us
 
 - [ ] Botão desabilitado durante execução (evitar cliques duplos)
 - [ ] Área de log atualizada linha a linha com cada step do `RecoveryResult`
-- [ ] Status final: ✓ (verde) ou ✗ (vermelho)
+- [ ] Status final: sucesso (verde) ou falha (vermelho)
 - [ ] Erros exibidos em mensagem legível — não stacktrace bruto
 
 ---
 
-## Checklist: TUI (Terminal)
+## Instruções: TUI (Terminal)
 
 ### 1. Criar componente TUI
 
@@ -55,17 +54,17 @@ description: "Criando componente de UI (Controller JavaFX ou componente TUI). Us
 
 ### 2. Integrar no menu principal TUI
 
-- [ ] `MainMenuComponent` ou equivalente deve listar a nova opção
+- [ ] `MainMenuComponent` ou equivalente lista a nova opção
 - [ ] Tecla/número atribuído documentado no componente
 
 ---
 
 ## Critical
 
-- NUNCA coloque lógica de negócio em controllers ou componentes TUI
-- NUNCA importe classes de `infrastructure/` na GUI/TUI
-- GUI e TUI devem ser substituíveis — mesmos use cases, output diferente
-- Se precisar de lógica antes de chamar use case, essa lógica pertence ao use case
+- Lógica de negócio em controller ou componente TUI cria comportamento invisível ao use case — mova para o use case
+- Importar classes de `infrastructure/` na GUI/TUI cria acoplamento que impede substituição por mock
+- GUI e TUI devem ser substituíveis — mesmos use cases, output diferente; se divergirem, lógica vazou
+- Lógica que deve vir antes de chamar o use case pertence ao use case, não ao controller
 
 ## Exemplos
 
@@ -84,14 +83,14 @@ Ações:
 
 Ações:
 1. Cria `AudioTuiComponent` em `interfaces/tui/components/`
-2. `render()`: imprime linha "2) Fix Audio"
-3. `handleInput("2")`: chama `FixAudioUseCase.execute()`  
+2. `render()`: imprime linha `"2) Fix Audio"`
+3. `handleInput("2")`: chama `FixAudioUseCase.execute()`
 4. Imprime cada step via `tuiPrinter.println(step.message())`
 5. Imprime `[OK]` ou `[FAIL]` ao final
 
 ## Troubleshooting
 
-**Controller chama ProcessBuilder**
+**Controller chama `ProcessBuilder`**
 - Causa: lógica de negócio no controller — violação de Clean Architecture
 - Solução: Mover lógica para Use Case, controller apenas chama `useCase.execute()`
 
@@ -101,9 +100,9 @@ Ações:
 
 **TUI exibe stacktrace ao usuário**
 - Causa: exception não tratada no componente
-- Solução: Catching exception, transformar em `RecoveryResult` com `success=false` e mensagem legível
+- Solução: Capturar exception, transformar em `RecoveryResult` com `success=false` e mensagem legível
 
 ## Consulte também
 
-- [create-use-case](../create-use-case/SKILL.md) — Pré-requisito: use case deve existir antes
-- [enforce-architecture](../enforce-architecture/SKILL.md) — Validação final obrigatória
+- [create-use-case](../create-use-case/SKILL.md) — pré-requisito: use case deve existir antes
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória

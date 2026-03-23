@@ -1,6 +1,6 @@
 ---
 name: layer-domain
-description: "Trabalhando na camada de domain/core. Use para criar ou alterar entidades, value objects, enums, resultados de execução e ports centrais do problema. Não use para orquestração, adapters ou UI."
+description: "Modelando a camada domain/core. Use quando criar ou alterar entidades, value objects, enums, resultados de execução ou ports centrais do problema. Não use para orquestração de use cases (use layer-application), adapters concretos (use layer-infrastructure) ou componentes de UI (use layer-interface)."
 ---
 
 # Skill: Camada Domain
@@ -16,32 +16,28 @@ description: "Trabalhando na camada de domain/core. Use para criar ou alterar en
 
 Domain descreve o problema, não a implementação.
 
-Esta camada pode definir:
-- conceitos do sistema
-- regras de consistência
+Pode definir:
+- conceitos do sistema, regras de consistência
 - tipos de entrada e saída centrais
 - interfaces/ports que outras camadas implementarão
 
-Esta camada não pode conhecer:
-- JavaFX
-- TUI/TTY
-- `ProcessBuilder`
+Não pode conhecer:
+- JavaFX, TUI/TTY, `ProcessBuilder`
 - `systemctl`, `journalctl`, `sudo`
 - Ubuntu, Fedora ou GNOME como implementação concreta
 
-## Checklist
+## Instruções
 
 ### 1. Modelar conceitos puros
 
 - [ ] Arquivo em `src/main/java/org/fixkitty/core/...`
 - [ ] Nome do tipo expressa conceito do problema, não da tecnologia
-- [ ] API pequena e explícita
-- [ ] Sem efeitos colaterais externos
+- [ ] API pequena e explícita, sem efeitos colaterais externos
 
 ### 2. Proteger invariantes
 
-- [ ] Validações ficam no construtor/factory quando necessário
-- [ ] Estados inválidos são impedidos cedo
+- [ ] Validações no construtor/factory quando necessário
+- [ ] Estados inválidos impedidos cedo
 - [ ] `equals/hashCode/toString` só quando fizer sentido semântico
 
 ### 3. Definir ports quando necessário
@@ -51,10 +47,10 @@ Esta camada não pode conhecer:
 
 ## Critical
 
-- NUNCA importar `org.fixkitty.application`, `org.fixkitty.infrastructure` ou `org.fixkitty.interfaces`
-- NUNCA construir comandos shell aqui
-- NUNCA colocar nomes de serviços Linux como regra fixa do domínio
-- Domain deve continuar válido mesmo se a infra mudar completamente
+- Imports de `application`, `infrastructure` ou `interfaces` aqui indicam design errado — mova a dependência para a camada correta
+- Comandos shell construídos no domain quebram isolamento — delegue ao port correspondente
+- Nomes de serviços Linux hardcoded como constantes criam acoplamento invisível — use abstrações semânticas
+- Domain deve compilar e testar sem nenhuma dependência de infra ou UI
 
 ## Exemplos
 
@@ -74,10 +70,20 @@ Use quando a aplicação precisar executar algo externo.
 Ações:
 1. Criar interface em `core/ports/CommandRunner.java`
 2. Método recebe request do domínio e retorna resultado tipado
-3. Infra implementa depois
+3. Infra implementa depois; domain não sabe como
+
+## Troubleshooting
+
+**Domain acumula lógica de distro específica**
+- Causa: strings de serviço (`pipewire`, `NetworkManager`) hardcoded no domínio
+- Solução: Criar enum ou abstração semântica; implementação concreta vai no profile de infra
+
+**Tipo de domínio cresce descontroladamente**
+- Causa: mistura de conceito de domínio com detalhe de infraestrutura
+- Solução: Separar — domain mantém o contrato, infra mantém o detalhe
 
 ## Consulte também
 
-- [../layer-application/SKILL.md](../layer-application/SKILL.md) — quando começar a orquestração
-- [../write-tests/SKILL.md](../write-tests/SKILL.md) — testes de domain e application
-- [../enforce-architecture/SKILL.md](../enforce-architecture/SKILL.md) — validação final obrigatória
+- [layer-application](../layer-application/SKILL.md) — quando começar a orquestração
+- [write-tests](../write-tests/SKILL.md) — testes de domain e application
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória

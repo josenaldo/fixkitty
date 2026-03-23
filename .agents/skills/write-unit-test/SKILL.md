@@ -1,6 +1,6 @@
 ---
 name: write-unit-test
-description: "Escrevendo testes unitários para Use Cases e Domain. Use para testar orquestração de recovery, comportamento de RecoveryResult, mocks de PrivilegeManager e CommandRunner. Não use para testar GUI/TUI diretamente."
+description: "Escrevendo testes unitários para Use Cases e Domain. Use para testar orquestração de recovery, comportamento de RecoveryResult e mocks de PrivilegeManager e CommandRunner. Não use para testar GUI/TUI (headless JavaFX) nem para testes de integração com shell real."
 ---
 
 # Skill: Escrever Teste Unitário (Micro-Skill)
@@ -8,7 +8,7 @@ description: "Escrevendo testes unitários para Use Cases e Domain. Use para tes
 ## Quando usar
 
 - Criar testes para novo Use Case
-- Testar entidades de domain (RecoveryAction, EnvironmentProfile)
+- Testar entidades de domain (`RecoveryAction`, `EnvironmentProfile`)
 - Mockar `CommandRunner` e `PrivilegeManager` para isolar testes
 - Validar que `RecoveryResult` contém steps e status corretos
 
@@ -17,11 +17,9 @@ description: "Escrevendo testes unitários para Use Cases e Domain. Use para tes
 - **Framework**: JUnit 5 (`org.junit.jupiter`)
 - **Mocks**: Mockito (adicionar dependência em `build.gradle.kts` quando necessário)
 - **Path**: `src/test/java/org/fixkitty/...`
-- **Convenção de nome**: `{Classe}Test.java` no mesmo subpackage da classe testada
+- **Convenção**: `{Classe}Test.java` no mesmo subpackage da classe testada
 
----
-
-## Checklist
+## Instruções
 
 ### 1. Criar classe de teste
 
@@ -33,13 +31,13 @@ description: "Escrevendo testes unitários para Use Cases e Domain. Use para tes
 
 - [ ] **Happy path**: execução bem-sucedida, `RecoveryResult.isSuccess() == true`
 - [ ] **Falha parcial**: um step falha, outros continuam (ou param, conforme política)
-- [ ] **Ação não suportada**: `profile.isSupported(actionId)` retorna false → resultado com erro claro
+- [ ] **Ação não suportada**: `profile.isSupported(actionId)` retorna `false` → resultado com erro claro
 
 ### 3. Mockar dependências externas
 
 - [ ] `CommandRunner runner = mock(CommandRunner.class)` — nunca chame shell real
 - [ ] `EnvironmentProfile profile = mock(EnvironmentProfile.class)` — controle de `isSupported()`
-- [ ] `PrivilegeManager privilege = mock(PrivilegeManager.class)` — conforme MEMORY.md concern
+- [ ] `PrivilegeManager privilege = mock(PrivilegeManager.class)` — conforme concern do MEMORY.md
 
 ### 4. Assertions
 
@@ -48,18 +46,16 @@ description: "Escrevendo testes unitários para Use Cases e Domain. Use para tes
 - [ ] `assertEquals(expectedSteps, result.steps().size())`
 - [ ] Para erros: `assertNotNull(result.errorMessage())`
 
----
-
 ## Critical
 
-- NUNCA chame `ProcessBuilder`, `Runtime.exec()` ou qualquer shell em testes
-- NUNCA teste GUI (JavaFX/TUI) nesta skill — esses testes são de unidade da camada application/domain
-- Testes DEVEM ser reproduzíveis sem Java FX runtime (sem `--module-path`)
-- Se precisar de `@DisplayName`, use — melhora legibilidade no relatório
+- Chamar `ProcessBuilder` ou `Runtime.exec()` em teste de unidade invalida o isolamento — use mock
+- Testar GUI (JavaFX/TUI) nesta skill foge do escopo — use teste de comportamento separado
+- Testes de unidade devem passar sem `--module-path` de JavaFX runtime
+- Estado compartilhado entre testes causa falhas por ordem de execução — reset em `@BeforeEach`
 
 ## Exemplos
 
-### Exemplo 1: Teste de FixAudioUseCase — happy path
+### Exemplo 1: Happy path — Fix Audio
 
 ```java
 @Test
@@ -75,7 +71,7 @@ void shouldReturnSuccessWhenAudioRestored() {
 }
 ```
 
-### Exemplo 2: Teste de ação não suportada
+### Exemplo 2: Acao nao suportada
 
 ```java
 @Test
@@ -87,25 +83,25 @@ void shouldFailWhenNotSupported() {
 
     assertFalse(result.isSuccess());
     assertNotNull(result.errorMessage());
-    assertTrue(result.errorMessage().contains("not supported"));
 }
 ```
 
 ## Troubleshooting
 
 **Teste acidentalmente executa comando real no sistema**
-- Causa: mock não configurado ou injeção errada no use case
-- Solução: Verificar que `CommandRunner` foi `@Mock`, não `new CommandRunner()`; checar construtor do use case
+- Causa: mock não configurado ou `CommandRunner` instanciado diretamente no use case
+- Solução: Verificar que `CommandRunner` foi `@Mock`, não `new ProcessBuilderCommandRunner()`; checar construtor do use case
 
 **Teste depende da ordem de execução**
 - Causa: estado compartilhado entre testes
 - Solução: Mover setup para `@BeforeEach`; garantir que mocks são reiniciados por teste
 
-**JavaFX HeadlessException em teste**
+**`JavaFX HeadlessException` em teste**
 - Causa: teste acidentalmente instancia controller GUI
 - Solução: Remover import de GUI do teste; testar apenas camada application/domain
 
 ## Consulte também
 
-- [create-use-case](../create-use-case/SKILL.md) — O que está sendo testado
-- [enforce-architecture](../enforce-architecture/SKILL.md) — Validação final obrigatória
+- [create-use-case](../create-use-case/SKILL.md) — o que está sendo testado
+- [write-tests](../write-tests/SKILL.md) — estratégia de cobertura por camada
+- [enforce-architecture](../enforce-architecture/SKILL.md) — validação final obrigatória
