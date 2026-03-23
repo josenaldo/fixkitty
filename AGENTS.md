@@ -31,7 +31,8 @@ Ver `.agents/skills/` para procedimentos detalhados:
 - `create-use-case` — Criar orquestrador de execução
 - `create-environment-profile` — Novo profile de distro/desktop
 - `create-ui-component` — Controller JavaFX ou TUI
-- `enforce-architecture` — Validar fronteiras Clean Architecture
+- `write-unit-test` — Testes unitários de Use Cases e domain
+- `enforce-architecture` — Validar fronteiras Clean Architecture (passo final obrigatório)
 
 ## Memory
 
