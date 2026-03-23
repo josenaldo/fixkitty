@@ -27,6 +27,12 @@ Java 25 + JavaFX + Clean Architecture. Multi-interface desktop recovery tool (GU
 ## Skills
 
 Ver `.agents/skills/` para procedimentos detalhados:
+- `layer-domain` — Modelagem da camada core/domain
+- `layer-application` — Orquestração de use cases
+- `layer-infrastructure` — Adapters, profiles e integrações Linux
+- `layer-interface` — GUI JavaFX, TUI e bootstrap de entrada
+- `write-tests` — Estratégia de testes por camada
+- `implement-feature` — Ciclo completo de implementação ponta a ponta
 - `create-recovery-action` — Definir ação de reset
 - `create-use-case` — Criar orquestrador de execução
 - `create-environment-profile` — Novo profile de distro/desktop

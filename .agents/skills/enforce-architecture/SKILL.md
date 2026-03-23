@@ -1,6 +1,6 @@
 ---
 name: enforce-architecture
-description: "Constraint-skill: valida fronteiras de Clean Architecture no projeto fixkitty. Use SEMPRE como último passo ao criar qualquer artefato (ação, use case, UI, profile). Detecta importações proibidas entre camadas."
+description: "Constraint-skill: valida fronteiras de Clean Architecture no projeto fixkitty. Use SEMPRE como último passo ao criar ou alterar qualquer artefato, seja por camada ou por feature. Detecta importações proibidas, responsabilidades vazadas e acoplamentos indevidos."
 ---
 
 # Skill: Enforcer de Arquitetura (Constraint-Skill)
@@ -11,6 +11,7 @@ description: "Constraint-skill: valida fronteiras de Clean Architecture no proje
 - Ao revisar código de qualquer camada
 - Antes de commit de código novo
 - Quando suspeitar de vazamento de responsabilidade entre camadas
+- Depois de usar skills por camada ou a meta-skill `implement-feature`
 
 ---
 
@@ -50,6 +51,8 @@ Para cada arquivo Java novo ou modificado:
 - [ ] Use cases NÃO constroem `ProcessBuilder` nem constroem strings de comando shell
 - [ ] Domain entities NÃO têm referência a serviços Linux específicos (PipeWire, systemctl etc.)
 - [ ] Environment profiles NÃO executam comandos — apenas declaram strings
+- [ ] Domain NÃO modela detalhes de framework ou adapter concreto
+- [ ] Infrastructure NÃO redefine regras que deveriam morar em domain/application
 
 ### 3. Verificar estrutura de pacotes
 
@@ -136,6 +139,11 @@ Correção: Criar interface `CommandRunner` em `core/ports/`, injetar via constr
 
 ## Consulte também
 
-- Todas as outras skills referenciam esta — é o passo final obrigatório
+- [../layer-domain/SKILL.md](../layer-domain/SKILL.md)
+- [../layer-application/SKILL.md](../layer-application/SKILL.md)
+- [../layer-infrastructure/SKILL.md](../layer-infrastructure/SKILL.md)
+- [../layer-interface/SKILL.md](../layer-interface/SKILL.md)
+- [../write-tests/SKILL.md](../write-tests/SKILL.md)
+- [../implement-feature/SKILL.md](../implement-feature/SKILL.md)
 - `memory/MEMORY.md` — Decisões arquiteturais registradas
 - `AGENTS.md` — Regras de arquitetura (fonte de verdade)
