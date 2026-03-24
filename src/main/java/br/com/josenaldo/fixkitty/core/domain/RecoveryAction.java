@@ -41,4 +41,16 @@ public enum RecoveryAction {
     public String displayName() {
         return displayName;
     }
+
+    /**
+     * Returns {@code true} if this action executes recovery commands.
+     *
+     * <p>Returns {@code false} for informational actions like
+     * {@link #CHECK_ENVIRONMENT} that do not run recovery steps.
+     *
+     * @return {@code true} for executable actions
+     */
+    public boolean isExecutable() {
+        return this != CHECK_ENVIRONMENT;
+    }
 }

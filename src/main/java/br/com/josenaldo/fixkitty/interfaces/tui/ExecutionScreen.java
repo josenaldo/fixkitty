@@ -32,13 +32,32 @@ class ExecutionScreen {
     /**
      * Executes the given action and shows the result.
      *
+     * <p>Displays a progress window before execution so the user receives
+     * immediate feedback (Phase 1: synchronous execution).
+     *
      * @param gui    the active window-based text GUI
      * @param action the action to execute
      */
     void run(WindowBasedTextGUI gui, RecoveryAction action) {
         log.info("Executing action: {}", action);
-        // Phase 1: synchronous execution (progress shown after completion)
+
+        // Show progress window (Phase 1: replaced after synchronous execution)
+        BasicWindow progressWindow = new BasicWindow("Running: " + action.displayName());
+        progressWindow.setHints(java.util.List.of(Window.Hint.CENTERED));
+        Panel panel = new Panel();
+        panel.addComponent(new Label("Running " + action.displayName() + "..."));
+        panel.addComponent(new Label("Please wait."));
+        progressWindow.setComponent(panel);
+        gui.addWindow(progressWindow);
+        try {
+            gui.updateScreen();
+        } catch (java.io.IOException e) {
+            log.warn("Failed to render progress window: {}", e.getMessage());
+        }
+
         ExecutionResult result = executeUseCase.execute(action);
+
+        progressWindow.close();
         resultScreen.show(gui, result);
     }
 }

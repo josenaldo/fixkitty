@@ -59,12 +59,11 @@ class MainMenuScreen {
         panel.addComponent(new EmptySpace());
 
         for (RecoveryAction action : actions) {
-            RecoveryAction captured = action;
             Button btn = new Button(action.displayName(), () -> {
-                if (captured == RecoveryAction.CHECK_ENVIRONMENT) {
-                    environmentScreen.show(gui);
+                if (action.isExecutable()) {
+                    executionScreen.run(gui, action);
                 } else {
-                    executionScreen.run(gui, captured);
+                    environmentScreen.show(gui);
                 }
             });
             panel.addComponent(btn);

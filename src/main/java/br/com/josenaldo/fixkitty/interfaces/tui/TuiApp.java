@@ -55,8 +55,8 @@ public class TuiApp {
             if (screen != null) {
                 try {
                     screen.stopScreen();
-                } catch (Exception ignored) {
-                    // best effort
+                } catch (Exception e) {
+                    log.warn("Failed to stop TUI screen cleanly: {}", e.getMessage());
                 }
             }
         }
