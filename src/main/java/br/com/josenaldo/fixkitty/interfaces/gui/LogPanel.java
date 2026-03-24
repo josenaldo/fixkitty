@@ -1,6 +1,7 @@
 package br.com.josenaldo.fixkitty.interfaces.gui;
 
-import br.com.josenaldo.fixkitty.core.domain.*;
+import br.com.josenaldo.fixkitty.core.domain.StepResult;
+import br.com.josenaldo.fixkitty.core.domain.StepStatus;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -51,7 +52,7 @@ public class LogPanel extends VBox {
             case TIMEOUT -> "[TIMEOUT]";
             case SKIPPED -> "[SKIPPED]";
         };
-        area.appendText(String.format("%s %s %s%n", time, icon, result.step().description()));
+        area.appendText(String.format("%s %s %s\n", time, icon, result.step().description()));
 
         if (result.status() == StepStatus.FAILED || result.status() == StepStatus.TIMEOUT) {
             if (!result.stderr().isBlank()) {

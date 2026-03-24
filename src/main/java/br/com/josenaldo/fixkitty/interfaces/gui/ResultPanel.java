@@ -1,6 +1,7 @@
 package br.com.josenaldo.fixkitty.interfaces.gui;
 
-import br.com.josenaldo.fixkitty.core.domain.*;
+import br.com.josenaldo.fixkitty.core.domain.ExecutionResult;
+import br.com.josenaldo.fixkitty.core.domain.ResultStatus;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;

@@ -27,12 +27,15 @@ public class AppRestarter {
 
         if (javaCmd == null) {
             log.warn("Could not determine java executable path — skipping relaunch");
+            // Stop the JavaFX toolkit before terminating the JVM
             Platform.exit();
             System.exit(0);
             return;
         }
 
         // Build relaunch command: wait 3s for GNOME shell to settle, then relaunch
+        // NOTE: Phase 1 limitation — paths are not quoted, so spaces in javaCmd or jarPath
+        // will cause failures. Will be replaced with jpackage launcher in Phase 5.
         String relaunchScript = "sleep 3 && nohup " + javaCmd
             + " -jar " + getJarPath() + " &";
 
@@ -45,6 +48,7 @@ public class AppRestarter {
             log.error("Failed to schedule relaunch: {}", e.getMessage());
         }
 
+        // Stop the JavaFX toolkit before terminating the JVM
         Platform.exit();
         System.exit(0);
     }
