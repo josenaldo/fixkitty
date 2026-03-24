@@ -17,4 +17,19 @@ class RecoveryActionTest {
     void allSixActionsExist() {
         assertEquals(6, RecoveryAction.values().length);
     }
+
+    @Test
+    void checkEnvironment_isNotExecutable() {
+        assertFalse(RecoveryAction.CHECK_ENVIRONMENT.isExecutable());
+    }
+
+    @Test
+    void allNonCheckActions_areExecutable() {
+        for (RecoveryAction action : RecoveryAction.values()) {
+            if (action != RecoveryAction.CHECK_ENVIRONMENT) {
+                assertTrue(action.isExecutable(),
+                    action.name() + " should be executable");
+            }
+        }
+    }
 }

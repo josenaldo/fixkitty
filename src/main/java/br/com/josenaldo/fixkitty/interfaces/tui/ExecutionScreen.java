@@ -6,6 +6,9 @@ import com.googlecode.lanterna.gui2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
  * TUI screen that runs a recovery action and shows progress.
  *
@@ -43,7 +46,7 @@ class ExecutionScreen {
 
         // Show progress window (Phase 1: replaced after synchronous execution)
         BasicWindow progressWindow = new BasicWindow("Running: " + action.displayName());
-        progressWindow.setHints(java.util.List.of(Window.Hint.CENTERED));
+        progressWindow.setHints(List.of(Window.Hint.CENTERED));
         Panel panel = new Panel();
         panel.addComponent(new Label("Running " + action.displayName() + "..."));
         panel.addComponent(new Label("Please wait."));
@@ -51,13 +54,16 @@ class ExecutionScreen {
         gui.addWindow(progressWindow);
         try {
             gui.updateScreen();
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             log.warn("Failed to render progress window: {}", e.getMessage());
         }
 
-        ExecutionResult result = executeUseCase.execute(action);
-
-        progressWindow.close();
+        ExecutionResult result;
+        try {
+            result = executeUseCase.execute(action);
+        } finally {
+            progressWindow.close();
+        }
         resultScreen.show(gui, result);
     }
 }
