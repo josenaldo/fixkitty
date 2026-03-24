@@ -56,6 +56,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs("-Dnet.bytebuddy.experimental=true")
 }
 
 tasks.run.get().jvmArgs = listOf("--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED")
