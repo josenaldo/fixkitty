@@ -1,5 +1,6 @@
 package br.com.josenaldo.fixkitty.bootstrap;
 
+import br.com.josenaldo.fixkitty.interfaces.gui.GuiApp;
 import br.com.josenaldo.fixkitty.interfaces.tui.TuiApp;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -34,7 +35,8 @@ public class Main {
             tuiApp.start();
         } else {
             log.info("Launching GUI");
-            log.warn("GUI not yet implemented — will use injector in Task 17");
+            GuiApp.injector = injector;
+            javafx.application.Application.launch(GuiApp.class, args);
         }
     }
 }
