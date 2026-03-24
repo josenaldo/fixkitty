@@ -41,18 +41,24 @@ public class TuiApp {
      * Starts the TUI application, blocking until the user exits.
      */
     public void start() {
+        Screen screen = null;
         try {
-            Screen screen = new DefaultTerminalFactory().createScreen();
+            screen = new DefaultTerminalFactory().createScreen();
             screen.startScreen();
-
             MainMenuScreen menu = new MainMenuScreen(
                 executeUseCase, listActionsUseCase, checkEnvironmentUseCase);
             menu.show(screen);
-
-            screen.stopScreen();
         } catch (Exception e) {
             log.error("TUI error: {}", e.getMessage(), e);
             System.err.println("TUI error: " + e.getMessage());
+        } finally {
+            if (screen != null) {
+                try {
+                    screen.stopScreen();
+                } catch (Exception ignored) {
+                    // best effort
+                }
+            }
         }
     }
 }

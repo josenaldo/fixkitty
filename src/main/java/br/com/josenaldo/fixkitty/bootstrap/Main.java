@@ -1,5 +1,6 @@
 package br.com.josenaldo.fixkitty.bootstrap;
 
+import br.com.josenaldo.fixkitty.interfaces.tui.TuiApp;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -29,7 +30,8 @@ public class Main {
 
         if (tuiMode) {
             log.info("Launching TUI");
-            log.warn("TUI not yet implemented — will use injector in Task 15");
+            TuiApp tuiApp = injector.getInstance(TuiApp.class);
+            tuiApp.start();
         } else {
             log.info("Launching GUI");
             log.warn("GUI not yet implemented — will use injector in Task 17");
