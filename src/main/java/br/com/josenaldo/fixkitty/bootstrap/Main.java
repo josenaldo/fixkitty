@@ -25,16 +25,14 @@ public class Main {
         InterfaceSelector selector = new InterfaceSelector();
         boolean tuiMode = selector.shouldUseTui(args);
 
-        Injector injector = Guice.createInjector(new AppModule(tuiMode));
+        Injector injector = Guice.createInjector(new AppModule(tuiMode)); // used in Task 13+
 
         if (tuiMode) {
             log.info("Launching TUI");
-            // TuiApp will be wired here in Phase 1.4
-            System.out.println("[FixKitty TUI — not yet implemented]");
+            log.warn("TUI not yet implemented — will use injector in Task 15");
         } else {
             log.info("Launching GUI");
-            // GuiApp will be launched here in Phase 1.5
-            System.out.println("[FixKitty GUI — not yet implemented]");
+            log.warn("GUI not yet implemented — will use injector in Task 17");
         }
     }
 }

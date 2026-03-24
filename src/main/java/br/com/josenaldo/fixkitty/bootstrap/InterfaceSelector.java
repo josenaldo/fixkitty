@@ -20,6 +20,9 @@ public class InterfaceSelector {
      * @return {@code true} for TUI, {@code false} for GUI
      */
     public boolean shouldUseTui(String[] args) {
+        if (args == null) {
+            args = new String[0];
+        }
         for (String arg : args) {
             if ("--tui".equals(arg)) {
                 log.info("TUI mode selected via --tui argument");
