@@ -5,6 +5,8 @@ import br.com.josenaldo.fixkitty.core.domain.EnvironmentProfile;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JavaFX panel that displays the detected Linux environment profile.
@@ -13,6 +15,8 @@ import javafx.scene.layout.VBox;
  * Contains no business logic — delegates detection to {@link CheckEnvironmentUseCase}.
  */
 public class EnvironmentPanel extends VBox {
+
+    private static final Logger log = LoggerFactory.getLogger(EnvironmentPanel.class);
 
     private final CheckEnvironmentUseCase checkEnvironmentUseCase;
     private final Label distroLabel = new Label();
@@ -32,7 +36,15 @@ public class EnvironmentPanel extends VBox {
         getChildren().addAll(
             new Label("Environment"),
             distroLabel, desktopLabel, audioLabel, sessionLabel);
-        refresh();
+        try {
+            refresh();
+        } catch (Exception e) {
+            log.warn("Environment detection failed on startup: {}", e.getMessage());
+            distroLabel.setText("Distro:    (detection failed)");
+            desktopLabel.setText("Desktop:   (detection failed)");
+            audioLabel.setText("Audio:     (detection failed)");
+            sessionLabel.setText("Session:   (detection failed)");
+        }
     }
 
     /**

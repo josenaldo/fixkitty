@@ -3,6 +3,7 @@ package br.com.josenaldo.fixkitty.interfaces.gui;
 import atlantafx.base.theme.Dracula;
 import br.com.josenaldo.fixkitty.application.*;
 import com.google.inject.Injector;
+import java.util.Objects;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -16,7 +17,13 @@ import javafx.stage.Stage;
  */
 public class GuiApp extends Application {
 
-    /** Set by Main before Application.launch() is called. */
+    /**
+     * Set by Main before Application.launch() is called.
+     *
+     * <p>Must be {@code public} because {@code Main} is in the {@code bootstrap}
+     * package and JavaFX reflectively instantiates {@code GuiApp}, preventing
+     * constructor injection. Set exactly once before {@link Application#launch}.
+     */
     public static Injector injector;
 
     /**
@@ -26,6 +33,7 @@ public class GuiApp extends Application {
      */
     @Override
     public void start(Stage stage) {
+        Objects.requireNonNull(injector, "GuiApp.injector must be set before launch()");
         Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
 
         ExecuteRecoveryUseCase executeUseCase = injector.getInstance(ExecuteRecoveryUseCase.class);
