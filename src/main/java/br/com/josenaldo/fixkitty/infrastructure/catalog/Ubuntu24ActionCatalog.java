@@ -15,11 +15,24 @@ import java.util.List;
  */
 public class Ubuntu24ActionCatalog implements ActionCatalog {
 
+    /**
+     * Returns all available {@link RecoveryAction} values for the given profile.
+     *
+     * @param profile the current environment profile (ignored; all actions are supported)
+     * @return list of all recovery actions
+     */
     @Override
     public List<RecoveryAction> actionsFor(EnvironmentProfile profile) {
         return Arrays.asList(RecoveryAction.values());
     }
 
+    /**
+     * Returns the execution plan (list of {@link ExecutionStep}) for the given action and profile.
+     *
+     * @param action  the recovery action to plan
+     * @param profile the current environment profile
+     * @return ordered list of steps to execute
+     */
     @Override
     public List<ExecutionStep> planFor(RecoveryAction action, EnvironmentProfile profile) {
         return switch (action) {
@@ -68,6 +81,13 @@ public class Ubuntu24ActionCatalog implements ActionCatalog {
         };
     }
 
+    /**
+     * Returns a default post-action recommendation message for the given action,
+     * or {@code null} for {@link RecoveryAction#CHECK_ENVIRONMENT}.
+     *
+     * @param action the recovery action
+     * @return human-readable recommendation string, or {@code null}
+     */
     @Override
     public String defaultRecommendationFor(RecoveryAction action) {
         return switch (action) {
