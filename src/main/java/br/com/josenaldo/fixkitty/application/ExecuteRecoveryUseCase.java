@@ -97,10 +97,11 @@ public class ExecuteRecoveryUseCase {
         long warnFailedCount = results.stream()
                 .filter(r -> (r.status() == StepStatus.FAILED || r.status() == StepStatus.TIMEOUT)
                         && r.step().onFailure() == FailurePolicy.WARN).count();
+        long hardFailedCount = failedCount - warnFailedCount;
 
         if (failedCount == 0) return ResultStatus.SUCCESS;
-        if (successCount == 0) return ResultStatus.FAILED;
         if (warnFailedCount == failedCount) return ResultStatus.SUCCESS; // all failures were non-critical WARN
+        if (successCount == 0 && hardFailedCount > 0) return ResultStatus.FAILED;
         return ResultStatus.PARTIAL;
     }
 }

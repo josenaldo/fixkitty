@@ -1,5 +1,6 @@
 package br.com.josenaldo.fixkitty.interfaces.gui;
 
+import java.io.File;
 import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +34,19 @@ public class AppRestarter {
             return;
         }
 
+        String jarPath = getJarPath();
+        File jar = new File(jarPath);
+        if (!jar.exists()) {
+            log.warn("Relaunch unavailable: jar not found at {} — please restart FixKitty manually", jarPath);
+            Platform.exit();
+            System.exit(0);
+            return;
+        }
+
         // Build relaunch command: wait 3s for GNOME shell to settle, then relaunch
         // NOTE: Phase 1 limitation — paths are not quoted, so spaces in javaCmd or jarPath
         // will cause failures. Will be replaced with jpackage launcher in Phase 5.
-        String relaunchScript = "sleep 3 && nohup " + javaCmd
-            + " -jar " + getJarPath() + " &";
+        String relaunchScript = "sleep 3 && nohup " + javaCmd + " -jar " + jarPath + " &";
 
         try {
             new ProcessBuilder("bash", "-c", relaunchScript)

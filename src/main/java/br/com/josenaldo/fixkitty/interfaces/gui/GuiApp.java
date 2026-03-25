@@ -24,7 +24,7 @@ public class GuiApp extends Application {
      * package and JavaFX reflectively instantiates {@code GuiApp}, preventing
      * constructor injection. Set exactly once before {@link Application#launch}.
      */
-    public static Injector injector;
+    public static volatile Injector injector;
 
     /**
      * Starts the JavaFX application, applies the Dracula theme, and shows the main window.

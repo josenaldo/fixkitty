@@ -115,4 +115,16 @@ class ExecuteRecoveryUseCaseTest {
         assertNull(result.recommendation());
         verify(catalog, never()).defaultRecommendationFor(any());
     }
+
+    @Test
+    void execute_warnPolicyFailure_returnsSuccess() {
+        ExecutionStep warnStep = new ExecutionStep("w1", "Warn step", new String[]{"warn"}, false, 5, FailurePolicy.WARN);
+        when(catalog.planFor(RecoveryAction.FIX_AUDIO, profile))
+            .thenReturn(List.of(warnStep));
+        when(runner.execute(warnStep)).thenReturn(failed(warnStep));
+
+        ExecutionResult result = useCase.execute(RecoveryAction.FIX_AUDIO);
+
+        assertEquals(ResultStatus.SUCCESS, result.status());
+    }
 }
