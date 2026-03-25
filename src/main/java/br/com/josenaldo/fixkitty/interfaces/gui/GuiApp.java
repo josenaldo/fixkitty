@@ -41,7 +41,7 @@ public class GuiApp extends Application {
         CheckEnvironmentUseCase checkEnvironmentUseCase = injector.getInstance(CheckEnvironmentUseCase.class);
 
         MainController controller = new MainController(
-            executeUseCase, listActionsUseCase, checkEnvironmentUseCase, stage);
+            executeUseCase, listActionsUseCase, checkEnvironmentUseCase);
 
         Scene scene = new Scene(controller.buildLayout(), 800, 600);
         stage.setTitle("FixKitty");

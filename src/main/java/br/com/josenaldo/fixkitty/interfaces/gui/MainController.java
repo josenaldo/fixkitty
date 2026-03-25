@@ -12,12 +12,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeBrands;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 /**
  * Main JavaFX controller for FixKitty.
@@ -31,7 +29,6 @@ public class MainController {
     private final ExecuteRecoveryUseCase executeUseCase;
     private final ListActionsUseCase listActionsUseCase;
     private final CheckEnvironmentUseCase checkEnvironmentUseCase;
-    private final Stage stage;
 
     private final EnvironmentPanel environmentPanel;
     private final LogPanel logPanel;
@@ -47,16 +44,13 @@ public class MainController {
      * @param executeUseCase          executes recovery actions
      * @param listActionsUseCase      lists available actions
      * @param checkEnvironmentUseCase detects the current environment
-     * @param stage                   the primary JavaFX stage
      */
     public MainController(ExecuteRecoveryUseCase executeUseCase,
                           ListActionsUseCase listActionsUseCase,
-                          CheckEnvironmentUseCase checkEnvironmentUseCase,
-                          Stage stage) {
+                          CheckEnvironmentUseCase checkEnvironmentUseCase) {
         this.executeUseCase = executeUseCase;
         this.listActionsUseCase = listActionsUseCase;
         this.checkEnvironmentUseCase = checkEnvironmentUseCase;
-        this.stage = stage;
         this.environmentPanel = new EnvironmentPanel(checkEnvironmentUseCase);
         this.logPanel = new LogPanel();
         this.resultPanel = new ResultPanel();
@@ -127,7 +121,7 @@ public class MainController {
         logPanel.clear();
         resultPanel.clear();
 
-        Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
+        Thread.ofVirtual().start(() -> {
             ExecutionResult result = executeUseCase.execute(action);
             Platform.runLater(() -> {
                 result.steps().forEach(logPanel::appendStep);
