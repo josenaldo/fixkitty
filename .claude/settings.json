@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"JOURNAL: Atualize docs/ai-journal/ com resumo da sessão (skills usadas, decisões, o que funcionou, o que não funcionou)\"}'",
+            "statusMessage": "Lembrete de journal..."
+          }
+        ]
+      }
+    ]
+  }
+}
