@@ -29,6 +29,12 @@ Casual, bem-humorado, primeira pessoa. Referências culturais BR. Honesto sobre 
 
 ---
 
+## Tamanho Alvo
+
+1.200–1.600 palavras. Os números por seção são guias, não limites rígidos.
+
+---
+
 ## Estrutura do Post
 
 ### Frontmatter
@@ -45,6 +51,8 @@ status: draft
 language: pt
 ---
 ```
+
+**Navegação de série:** Este é o post 1 de uma série aberta. Não há posts posteriores ainda. Incluir no corpo (não no frontmatter) uma linha simples no final: *"Esta é a Parte 1 da série FixKitty. Próximas partes publicadas conforme o projeto avança."*
 
 ### Seção 1: Abertura — A Dor Real (~200 palavras)
 
@@ -84,6 +92,8 @@ Explicar o que é Subagent-Driven Development em termos simples: em vez de deixa
 
 Mencionar o momento real: o teste do WARN policy que encontrou um bug de lógica real em `aggregate()`. Não para se gabar — para mostrar que a revisão funciona.
 
+> **Resumo do bug para o escritor:** O método `aggregate()` decide o resultado geral de uma execução (SUCCESS / PARTIAL / FAILED). Existe uma política chamada WARN: quando um passo falha com essa política, a falha é considerada não-crítica e o resultado geral ainda deve ser SUCCESS. O bug era que a ordem das verificações no método estava errada — quando *todos* os passos falhavam com WARN e nenhum tinha sucesso, o código retornava FAILED em vez de SUCCESS. O teste que a IA escreveu durante a revisão final revelou esse comportamento incorreto, que então foi corrigido. O ponto para o leitor: a IA de revisão encontrou um bug que a IA de implementação criou.
+
 Ser claro: você (o autor) ainda tomou todas as decisões. A IA executou. A diferença é que, com boas guardrails, o que a IA executou foi revisado antes de você aceitar.
 
 ### Seção 5: Fase 1 Concluída (~200 palavras)
@@ -106,9 +116,15 @@ O que vem a seguir:
 - Testes de integração com TestFX
 - Empacotamento para distribuição
 
-Convite para a série: "vou postar conforme construo, com o bem e o mal". Links para repo (se público) ou promessa de que vai publicar quando estiver pronto.
+Convite para a série: "vou postar conforme construo, com o bem e o mal". Incluir link para o repositório: `https://github.com/josenaldo/fixkitty`
 
 Encerramento no tom do autor — algo entre "vamos ver no que dá" e "isso vai ser divertido".
+
+---
+
+## Assets
+
+- **Imagem de capa:** `/images/blog/fixkitty-01-o-inicio.png` — criar antes de publicar. Sugestão: gato consertando algo, tom pixel art ou cartoon. Placeholder OK para o draft — marcar com `status: draft` até a imagem existir.
 
 ---
 
